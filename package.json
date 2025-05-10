@@ -16,6 +16,7 @@
     "express": "^4.19.2",
     "hyper-express": "^6.16.2",
     "hyper-express-cors": "^1.0.4",
+    "node-fetch": "^3.3.2",
     "openai": "^4.47.1"
   }
 }

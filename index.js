@@ -25,15 +25,43 @@ app.use(bodyParser.json());
       return res.status(400).json({ error: "Missing thread_id" });
     }
     console.log(`Received message: ${message} for thread ID: ${threadId}`);
+    
+    // Create message in thread
     await openai.beta.threads.messages.create(threadId, {
       role: "user",
       content: message,
     });
+    
+    // Get AI response
     const run = await openai.beta.threads.runs.createAndPoll(threadId, {
       assistant_id: assistantId,
     });
     const messages = await openai.beta.threads.messages.list(run.thread_id);
     const response = messages.data[0].content[0].text.value;
+
+    // Extract email using regex
+    const emailRegex = /[\w.-]+@[\w.-]+\.\w+/;
+    const emailMatch = message.match(emailRegex);
+    const email = emailMatch ? emailMatch[0] : null;
+
+    // Send to make.com webhook if email found
+    if (email) {
+      try {
+        await fetch('https://hook.us2.make.com/538cd02cr66b2une4g4iex53viko01ec', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: email,
+            intent: message
+          })
+        });
+      } catch (error) {
+        console.error('Error sending to webhook:', error);
+      }
+    }
+
     return res.json({ response });
   });
 
