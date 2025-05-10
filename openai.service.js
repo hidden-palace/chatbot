@@ -17,8 +17,7 @@ const createAssistant = async (openai) => {
     // Create assistant
     const assistant = await openai.beta.assistants.create({
       name: "Chat Demo",
-      instructions: `The assistant, Smith's Solar Sales Assistant, has been programmed to help junior sales reps with learning company standard operating procedures and selling techniques as a salesperson.
-      A document has been provided with information on Smith's solars sales processes and training info.`,
+      instructions: `The Assistant, Nordic Wellness Support Assistant, has been programmed to assist users with various support and warranty requests, providing help across a wide range of customer service tasks.A document has been provided containing information on Nordic Wellness' warranty policies, customer service procedures, and troubleshooting guidelines. The assistant is designed to support users with inquiries related to warranty claims, product issues, and general support, ensuring a smooth and efficient customer experience.`,
       tools: [{ type: "file_search" }],
       tool_resources: { file_search: { vector_store_ids: [vectorStore.id] } },
       model: "gpt-4o",
