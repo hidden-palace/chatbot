@@ -3,6 +3,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const app = express();
 const OpenAI = require("openai");
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -86,6 +87,12 @@ app.use(bodyParser.json());
         });
       } catch (error) {
         console.error('Error sending to phone webhook:', error);
+        console.log('Failed payload:', {
+          phone: phone,
+          firstName: name ? name[0] : null,
+          lastName: name ? name[name.length - 1] : null,
+          intent: message
+        });
       }
     }
 
