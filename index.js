@@ -39,15 +39,18 @@ app.use(bodyParser.json());
     const messages = await openai.beta.threads.messages.list(run.thread_id);
     const response = messages.data[0].content[0].text.value;
 
-    // Extract email and phone using regex
+    // Extract email, phone, and name using regex
     const emailRegex = /[\w.-]+@[\w.-]+\.\w+/;
     const phoneRegex = /(?:\+\d{1,3}[-. ]?)?\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}/;
+    const nameRegex = /(?:[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/;
     
     const emailMatch = message.match(emailRegex);
     const phoneMatch = message.match(phoneRegex);
+    const nameMatch = message.match(nameRegex);
     
     const email = emailMatch ? emailMatch[0] : null;
     const phone = phoneMatch ? phoneMatch[0] : null;
+    const name = nameMatch ? nameMatch[0].split(' ') : null;
 
     // Send to make.com webhooks if email or phone found
     if (email) {
@@ -76,6 +79,8 @@ app.use(bodyParser.json());
           },
           body: JSON.stringify({
             phone: phone,
+            firstName: name ? name[0] : null,
+            lastName: name ? name[name.length - 1] : null,
             intent: message
           })
         });
