@@ -39,12 +39,17 @@ app.use(bodyParser.json());
     const messages = await openai.beta.threads.messages.list(run.thread_id);
     const response = messages.data[0].content[0].text.value;
 
-    // Extract email using regex
+    // Extract email and phone using regex
     const emailRegex = /[\w.-]+@[\w.-]+\.\w+/;
+    const phoneRegex = /(?:\+\d{1,3}[-. ]?)?\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}/;
+    
     const emailMatch = message.match(emailRegex);
+    const phoneMatch = message.match(phoneRegex);
+    
     const email = emailMatch ? emailMatch[0] : null;
+    const phone = phoneMatch ? phoneMatch[0] : null;
 
-    // Send to make.com webhook if email found
+    // Send to make.com webhooks if email or phone found
     if (email) {
       try {
         await fetch('https://hook.us2.make.com/538cd02cr66b2une4g4iex53viko01ec', {
@@ -58,7 +63,24 @@ app.use(bodyParser.json());
           })
         });
       } catch (error) {
-        console.error('Error sending to webhook:', error);
+        console.error('Error sending to email webhook:', error);
+      }
+    }
+
+    if (phone) {
+      try {
+        await fetch('https://hook.us2.make.com/azarrw5ga5ot6aghdced31deuncpveya', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            phone: phone,
+            intent: message
+          })
+        });
+      } catch (error) {
+        console.error('Error sending to phone webhook:', error);
       }
     }
 
