@@ -26,13 +26,13 @@ app.use(bodyParser.json());
       return res.status(400).json({ error: "Missing thread_id" });
     }
     console.log(`Received message: ${message} for thread ID: ${threadId}`);
-    
+
     // Create message in thread
     await openai.beta.threads.messages.create(threadId, {
       role: "user",
       content: message,
     });
-    
+
     // Get AI response
     const run = await openai.beta.threads.runs.createAndPoll(threadId, {
       assistant_id: assistantId,
@@ -44,14 +44,14 @@ app.use(bodyParser.json());
     const emailRegex = /[\w.-]+@[\w.-]+\.\w+/;
     const phoneRegex = /(?:\+\d{1,3}[-. ]?)?\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}/;
     const nameRegex = /(?:[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/;
-    
+
     const emailMatch = message.match(emailRegex);
     const phoneMatch = message.match(phoneRegex);
     const nameMatch = message.match(nameRegex);
-    
+
     const email = emailMatch ? emailMatch[0] : null;
     const phone = phoneMatch ? phoneMatch[0] : null;
-    const name = nameMatch ? nameMatch[0].split(' ') : null;
+    const name = nameMatch ? nameMatch[1].split(' ') : null;
 
     // Send to make.com webhooks if email or phone found
     if (email) {
