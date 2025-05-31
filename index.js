@@ -53,19 +53,41 @@ app.use(bodyParser.json());
     const phone = phoneMatch ? phoneMatch[0] : null;
     const name = nameMatch ? nameMatch[1].split(' ') : null;
 
-    // Send to make.com webhooks if email or phone found
+    // Check if this is a brochure request (keywords that indicate brochure interest)
+    const brochureKeywords = ['brochure', 'brochures', 'information', 'details', 'catalog', 'materials', 'send me', 'email me'];
+    const isBrochureRequest = brochureKeywords.some(keyword => 
+      message.toLowerCase().includes(keyword) || response.toLowerCase().includes(keyword)
+    );
+
+    // Send to make.com webhooks if email found
     if (email) {
       try {
-        await fetch('https://hook.us2.make.com/538cd02cr66b2une4g4iex53viko01ec', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: email,
-            intent: message
-          })
-        });
+        if (isBrochureRequest) {
+          // Send to brochure webhook
+          await fetch('https://hook.us2.make.com/grvjhbwp9vvdiru4hfrqibn6imhx7ata', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email: email,
+              brochureRequest: message,
+              userInterest: message
+            })
+          });
+        } else {
+          // Send to general email webhook
+          await fetch('https://hook.us2.make.com/538cd02cr66b2une4g4iex53viko01ec', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email: email,
+              intent: message
+            })
+          });
+        }
       } catch (error) {
         console.error('Error sending to email webhook:', error);
       }
