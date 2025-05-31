@@ -51,7 +51,7 @@ app.use(bodyParser.json());
 
     const email = emailMatch ? emailMatch[0] : null;
     const phone = phoneMatch ? phoneMatch[0] : null;
-    const name = nameMatch ? nameMatch[1].split(' ') : null;
+    const name = nameMatch ? nameMatch[0].split(' ') : null;
 
     // Check if this is a brochure request (keywords that indicate brochure interest)
     const brochureKeywords = ['brochure', 'brochures', 'information', 'details', 'catalog', 'materials', 'send me', 'email me'];
